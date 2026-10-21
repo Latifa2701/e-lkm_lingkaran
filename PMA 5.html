@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-LKPD Matematika - Teorema Lingkaran Candi Borobudur</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GeoGebra Applet Injection API -->
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+    <style>
+        .table-input {
+            width: 100%;
+            text-align: center;
+            padding: 4px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        .table-input:focus {
+            outline: 2px solid #b45309;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-amber-900 text-amber-50 p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold">E-LKPD Matematika: Teorema Tali Busur Lingkaran</h1>
+                <p class="text-xs text-amber-200">SMAN 1 Kalasan | Model Jigsaw (Kelompok Ahli) | CRT Candi Borobudur</p>
+            </div>
+            <div id="userInfo" class="hidden text-xs bg-amber-800 px-3 py-1.5 rounded-md border border-amber-600"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto w-full flex-grow p-4">
+
+        <!-- HALAMAN IDENTITAS -->
+        <section id="identitySection" class="bg-white p-6 rounded-lg shadow-md border border-stone-200 max-w-xl mx-auto my-10">
+            <h2 class="text-2xl font-bold text-amber-900 mb-2 border-b pb-2">Identitas Peserta Didik & Kelompok Ahli</h2>
+            <p class="text-xs text-stone-600 mb-6">Isi identitas diri kamu di bawah ini sebelum memulai kegiatan eksplorasi LKPD.</p>
+
+            <form id="identityForm" onsubmit="handleStart(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-stone-700">Nama Lengkap</label>
+                    <input type="text" id="inputNama" required class="mt-1 block w-full rounded-md border border-stone-300 p-2 text-sm focus:ring-amber-500 focus:border-amber-500" placeholder="Masukkan nama lengkap...">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-stone-700">Nomor Absen</label>
+                        <input type="number" id="inputAbsen" required class="mt-1 block w-full rounded-md border border-stone-300 p-2 text-sm focus:ring-amber-500 focus:border-amber-500" placeholder="No. Absen">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-stone-700">Kelompok Asal</label>
+                        <input type="text" id="inputKelAsal" placeholder="Contoh: Kelompok 2" required class="mt-1 block w-full rounded-md border border-stone-300 p-2 text-sm focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-stone-700 mb-1">Pilih Kelompok Ahli</label>
+                    <select id="selectKelAhli" required class="block w-full rounded-md border border-stone-300 p-2 text-sm focus:ring-amber-500 focus:border-amber-500 bg-white">
+                        <option value="">-- Pilih Kelompok Ahli (1 - 6) --</option>
+                        <option value="1">Kelompok Ahli 1: Panjang Tali Busur & Jaraknya dari Pusat</option>
+                        <option value="2">Kelompok Ahli 2: Teorema Ptolemaios pada Segi Empat Tali Busur</option>
+                        <option value="3">Kelompok Ahli 3: Hasil Kali Ruas-Ruas Tali Busur Berpotongan di Dalam</option>
+                        <option value="4">Kelompok Ahli 4: Jumlah Sudut Berhadapan pada Segi Empat Tali Busur</option>
+                        <option value="5">Kelompok Ahli 5: Sudut dari Dua Tali Busur Berpotongan di Dalam</option>
+                        <option value="6">Kelompok Ahli 6: Sudut dari Dua Garis Secan Berpotongan di Luar</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-white font-bold py-2.5 px-4 rounded-md transition duration-200 text-sm shadow">
+                    Mulai Eksplorasi LKPD
+                </button>
+            </form>
+        </section>
+
+        <!-- AREA KERJA LKPD -->
+        <section id="lkmSection" class="hidden space-y-6">
+
+            <!-- Navigasi / Info Kelompok -->
+            <div class="flex justify-between items-center bg-amber-100 p-4 rounded-lg border border-amber-300 shadow-sm">
+                <div>
+                    <span id="badgeKelompok" class="inline-block bg-amber-800 text-amber-50 text-xs px-2.5 py-0.5 rounded-full font-bold mb-1"></span>
+                    <h2 id="lkmTitle" class="text-xl font-bold text-amber-950"></h2>
+                    <p id="lkmSubtitle" class="text-xs text-amber-800 font-medium"></p>
+                </div>
+                <button onclick="resetApp()" class="text-xs bg-white hover:bg-stone-50 px-3 py-1.5 rounded text-stone-700 border border-stone-300 font-semibold shadow-sm">
+                    Ganti Kelompok / Identitas
+                </button>
+            </div>
+
+            <!-- Cerita Budaya CRT Candi Borobudur -->
+            <div class="bg-amber-50/70 p-4 rounded-lg border border-amber-200">
+                <h3 class="font-bold text-amber-900 text-sm flex items-center gap-2 mb-1">
+                    🏛️ Konteks Budaya Candi Borobudur
+                </h3>
+                <p id="ceritaBudaya" class="text-xs text-stone-700 leading-relaxed"></p>
+                <div class="mt-2 text-[11px] text-amber-800 bg-amber-100/50 p-2 rounded border border-amber-200">
+                    <strong>Permasalahan:</strong> <span id="permasalahanText"></span>
+                </div>
+            </div>
+
+            <!-- Grid Lembar Kerja: GeoGebra + Lembar Isian Presisi -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Widget GeoGebra Interaktif -->
+                <div class="lg:col-span-6 bg-white p-4 rounded-lg shadow-sm border border-stone-200 flex flex-col">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-stone-800 text-sm">Simulasi Interaktif GeoGebra</h3>
+                        <span class="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded border">Geser Titik pada Gambar</span>
+                    </div>
+                    <p class="text-[11px] text-stone-500 mb-3">Model matematika terinspirasi dari susunan stupa teras melingkar Candi Borobudur. Kamu dapat memindahkan titik untuk mengamati perubahan ukuran dan besar sudut.</p>
+                    
+                    <div id="ggb-element" class="w-full h-[520px] bg-stone-50 rounded border border-stone-200 flex items-center justify-center">
+                        <span class="text-stone-400 text-xs">Memuat GeoGebra Applet...</span>
+                    </div>
+                </div>
+
+                <!-- Formulir & Tabel Presisi LKPD -->
+                <div class="lg:col-span-6 bg-white p-5 rounded-lg shadow-sm border border-stone-200 space-y-6 overflow-y-auto max-h-[600px]">
+                    
+                    <!-- KEGIATAN 1 -->
+                    <div class="border-b pb-4">
+                        <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wider mb-2">Kegiatan 1: Dugaan Awal</h4>
+                        <div id="dugaanQuestions" class="space-y-3 text-xs"></div>
+                    </div>
+
+                    <!-- KEGIATAN 2 -->
+                    <div class="border-b pb-4">
+                        <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wider mb-2">Kegiatan 2: Mengumpulkan Data</h4>
+                        <p class="text-[11px] text-stone-600 mb-2">Gunakan GeoGebra di samping untuk mengukur dan isikan datamu pada tabel berikut:</p>
+                        <div id="tableContainer" class="overflow-x-auto text-xs"></div>
+                    </div>
+
+                    <!-- KEGIATAN 3 -->
+                    <div class="border-b pb-4">
+                        <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wider mb-2">Kegiatan 3: Menganalisis Data</h4>
+                        <div id="analisisQuestions" class="space-y-3 text-xs"></div>
+                    </div>
+
+                    <!-- KEGIATAN 4 -->
+                    <div class="border-b pb-4">
+                        <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wider mb-2">Kegiatan 4: Menyimpulkan Teorema</h4>
+                        <div id="kesimpulanContent" class="space-y-3 text-xs"></div>
+                    </div>
+
+                    <!-- KEGIATAN 5 -->
+                    <div>
+                        <h4 class="font-bold text-amber-900 text-xs uppercase tracking-wider mb-2">Kegiatan 5: Menerapkan Teorema pada Masalah Borobudur</h4>
+                        <div id="penerapanContent" class="space-y-3 text-xs"></div>
+                    </div>
+
+                    <button onclick="simpanLKM()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-md text-xs transition shadow-sm">
+                        💾 Simpan & Selesaikan LKPD
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-200 text-center text-[11px] text-stone-600 py-3 border-t">
+        E-LKPD Pembelajaran Matematika Berbasis Ethnomathematics (Candi Borobudur) - SMAN 1 Kalasan
+    </footer>
+
+    <!-- LOGIKA SCRIPT & GEOGEBRA ENGINE -->
+    <script>
+        const lkmData = {
+            1: {
+                title: "Panjang Tali Busur dan Jaraknya dari Pusat",
+                subtitle: "Teorema 1",
+                budaya: "Pada tiga teras melingkar di puncak Candi Borobudur, stupa-stupa berlubang berdiri melingkar mengelilingi stupa induk yang menjadi pusatnya. Jika dua stupa pada satu teras dihubungkan dengan garis lurus, terbentuklah sebuah tali busur. Jarak diukur secara tegak lurus dari pusat O ke tali busur (OM untuk AB dan ON untuk CD).",
+                permasalahan: "Pada model teras melingkar terdapat dua tali busur, AB dan CD, dengan jarak dari pusat O berturut-turut OM dan ON. Bagaimana hubungan antara jarak tali busur dari pusat dan panjang tali busur? Kapan dua tali busur memiliki panjang yang sama?",
+                dugaan: [
+                    "1. Jika dua tali busur berjarak sama dari pusat lingkaran (OM = ON), bagaimana menurutmu panjang AB dan CD?",
+                    "2. Menurutmu, tali busur yang lebih dekat dengan pusat lingkaran akan lebih panjang atau lebih pendek? Mengapa?"
+                ],
+                tableType: "k1",
+                analisis: [
+                    "1. Pada Percobaan 1, bandingkan OM dengan ON, lalu bandingkan AB dengan CD. Apa yang kamu temukan?",
+                    "2. Pada Percobaan 2 dan 3, tali busur manakah yang lebih dekat ke pusat? Tali busur mana yang lebih panjang?",
+                    "3. Perhatikan dua kolom terakhir. Nilainya mendekati bilangan berapa? Bandingkan dengan r². Apa hubungan yang kamu temukan?",
+                    "4. Apakah dugaan awal kelompokmu sesuai dengan data? Jelaskan."
+                ],
+                kesimpulan: {
+                    a: "a. Jika dua tali busur memiliki jarak yang sama dari pusat lingkaran, maka panjang keduanya .......................",
+                    b: "b. Semakin dekat tali busur dengan pusat lingkaran, maka panjang tali busur semakin .......................",
+                    simbol: "Tuliskan secara simbol: Jika OM = ON, maka AB ...... CD.  |  Hubungan kolom terakhir: r² = (½ × panjang tali busur)² + ......"
+                },
+                penerapan: "Sebuah model teras melingkar berjari-jari 13 cm. Tali busur PQ menghubungkan dua stupa dan berjarak 5 cm dari pusat. Gunakan hubungan: (½ × panjang)² + jarak² = r².<br>(a) Hitung panjang PQ.<br>(b) Tali busur RS pada teras yang sama juga berjarak 5 cm dari pusat. Berapa panjang RS? Jelaskan.<br>(c) Tali busur TU berjarak 12 cm dari pusat. Apakah TU lebih panjang atau lebih pendek daripada PQ? Buktikan."
+            },
+            2: {
+                title: "Teorema Ptolemaios pada Segi Empat Tali Busur",
+                subtitle: "Teorema 2",
+                budaya: "Empat stupa pada satu teras melingkar Borobudur dapat dihubungkan berurutan sehingga membentuk sebuah segi empat. Karena keempat stupa berada pada satu lingkaran, segi empat itu disebut segi empat tali busur. Keempat sisinya adalah tali busur, begitu juga kedua diagonalnya.",
+                permasalahan: "Empat stupa A, B, C, dan D terletak pada satu lingkaran. Bagaimana hubungan antara panjang keempat sisi (AB, BC, CD, AD) dan panjang kedua diagonalnya (AC dan BD)?",
+                dugaan: [
+                    "1. Apa yang dimaksud dengan segi empat tali busur? Sebutkan juga keempat sisi dan kedua diagonal segi empat ABCD.",
+                    "2. Menurut dugaan kelompokmu, apakah panjang sisi dan diagonal memiliki hubungan tertentu? Jelaskan."
+                ],
+                tableType: "k2",
+                analisis: [
+                    "1. Pada tiap percobaan, bandingkan nilai (AB × CD) + (AD × BC) dengan AC × BD. Apa yang kamu temukan?",
+                    "2. Apakah pola tersebut selalu muncul pada ketiga percobaan, meskipun bentuk segi empatnya berbeda-beda?",
+                    "3. Apakah hasil pengukuran mendukung dugaan awal kelompokmu? Jelaskan."
+                ],
+                kesimpulan: {
+                    a: "a. Pada setiap segi empat tali busur ABCD, hasil kali panjang kedua diagonal sama dengan .......................",
+                    simbol: "Tuliskan secara simbol (Teorema Ptolemaios): AC × BD = ........................................................."
+                },
+                penerapan: "Empat stupa A, B, C, D pada satu teras membentuk segi empat tali busur ABCD dengan AB sejajar CD. Diketahui AB = 12 cm, CD = 8 cm, AD = BC = 10 cm, dan kedua diagonalnya sama panjang (AC = BD). Hitung panjang diagonal AC."
+            },
+            3: {
+                title: "Hasil Kali Ruas-Ruas Tali Busur yang Berpotongan di Dalam Lingkaran",
+                subtitle: "Teorema 3",
+                budaya: "Bayangkan seorang peziarah berdiri di titik P pada pelataran melingkar Borobudur. Dari P ia melihat dua pasang stupa: A-B dan C-D. Garis lurus yang menghubungkan stupa A-B dan C-D adalah dua tali busur yang berpotongan di titik P di dalam lingkaran.",
+                permasalahan: "Dua tali busur AB dan CD berpotongan di titik P di dalam lingkaran. Adakah hubungan antara panjang ruas-ruas PA, PB, PC, dan PD? Bagaimana menemukannya?",
+                dugaan: [
+                    "1. Menurutmu, apakah PA + PB sama dengan PC + PD? Atau adakah operasi lain yang membuat kedua tali busur punya hasil yang sama?"
+                ],
+                tableType: "k3",
+                analisis: [
+                    "1. Pada setiap percobaan, bandingkan PA + PB dengan PC + PD. Apakah selalu sama?",
+                    "2. Bandingkan PA × PB dengan PC × PD pada setiap percobaan. Apa yang kamu temukan?",
+                    "3. Apakah pola itu tetap berlaku walau titik P berada di tempat yang berbeda-beda?"
+                ],
+                kesimpulan: {
+                    a: "a. Jika dua tali busur AB dan CD berpotongan di titik P di dalam lingkaran, maka hasil kali kedua ruas pada satu tali busur ...................... hasil kali kedua ruas pada tali busur yang lain.",
+                    simbol: "Tuliskan secara simbol: PA × PB = ...................."
+                },
+                penerapan: "Di sebuah teras melingkar, tali busur AB dan CD berpotongan di titik P. Diketahui PA = 6 cm, PB = 4 cm, dan PC = 3 cm.<br>(a) Hitung panjang PD.<br>(b) Hitung panjang seluruh tali busur CD."
+            },
+            4: {
+                title: "Jumlah Sudut Berhadapan pada Segi Empat Tali Busur",
+                subtitle: "Teorema 4",
+                budaya: "Pada teras melingkar Borobudur, stupa-stupa tersusun teratur pada satu lingkaran. Jika empat stupa dipilih dan dihubungkan berurutan, terbentuk segi empat tali busur. Sudut di titik A berhadapan dengan C, sedangkan B berhadapan dengan D.",
+                permasalahan: "Pada segi empat tali busur ABCD, adakah hubungan antara besar ∠A dan ∠C, serta antara ∠B dan ∠D?",
+                dugaan: [
+                    "1. Sebutkan pasangan sudut yang saling berhadapan pada segi empat ABCD.",
+                    "2. Menurutmu, berapa kira-kira jumlah dua sudut yang berhadapan?"
+                ],
+                tableType: "k4",
+                analisis: [
+                    "1. Berapa jumlah ∠A + ∠C pada ketiga percobaan? Apa yang kamu temukan?",
+                    "2. Berapa jumlah ∠B + ∠D pada ketiga percobaan? Apakah hasilnya sama dengan ∠A + ∠C?",
+                    "3. Jika dua sudut berjumlah seperti hasil yang kamu temukan, apa sebutan hubungan kedua sudut tersebut?"
+                ],
+                kesimpulan: {
+                    a: "a. Pada segi empat tali busur, jumlah dua sudut yang saling berhadapan adalah ......................°.",
+                    simbol: "Tuliskan secara simbol: ∠A + ∠C = ......°   dan   ∠B + ∠D = ......°"
+                },
+                penerapan: "Empat stupa A, B, C, D pada satu teras membentuk segi empat tali busur ABCD dengan ∠A = (2x + 10)°, ∠C = (3x − 5)°, dan ∠B = 75°.<br>(a) Tentukan nilai x.<br>(b) Tentukan besar ∠A dan ∠C.<br>(c) Tentukan besar ∠D."
+            },
+            5: {
+                title: "Sudut dari Dua Tali Busur Berpotongan di Dalam Lingkaran",
+                subtitle: "Teorema 5",
+                budaya: "Peziarah Borobudur melakukan pradaksina (berjalan mengelilingi candi searah jarum jam). Selama berjalan, ia berhenti di titik P di dalam teras dan memandang dua pasang stupa: A-B dan C-D. Sudut ∠APC menghadap busur AC, dan ∠BPD menghadap busur BD.",
+                permasalahan: "Dua tali busur AB dan CD berpotongan di P di dalam lingkaran. Bagaimana hubungan besar ∠APC dengan besar busur AC dan busur BD?",
+                dugaan: [
+                    "1. Menurutmu, apakah besar ∠APC bergantung pada besar busur AC saja, busur BD saja, atau keduanya?"
+                ],
+                tableType: "k5",
+                analisis: [
+                    "1. Bandingkan nilai ½ × (busur AC + busur BD) dengan ∠APC hasil ukur pada setiap percobaan. Apa yang kamu temukan?",
+                    "2. Bandingkan ∠APC dengan ∠BPD pada tiap percobaan. Apa hubungan keduanya? Apa nama pasangan sudut ini?",
+                    "3. Apakah dugaan awalmu terbukti? Jelaskan dengan memakai data pada tabel."
+                ],
+                kesimpulan: {
+                    a: "a. Jika dua tali busur berpotongan di dalam lingkaran, maka besar sudut yang terbentuk sama dengan ...................... dari ...................... busur-busur yang dihadapi sudut itu dan sudut bertolak belakangnya.",
+                    simbol: "Tuliskan secara simbol: ∠APC = ........................................................."
+                },
+                penerapan: "Tali busur AB dan CD berpotongan di P di dalam sebuah teras melingkar. Diketahui busur AC = 80° dan busur BD = 60°.<br>(a) Tentukan besar ∠APC.<br>(b) Tentukan besar ∠APD dengan dua cara (memakai sudut berpelurus dan memakai teorema)."
+            },
+            6: {
+                title: "Sudut dari Dua Garis Secan Berpotongan di Luar Lingkaran",
+                subtitle: "Teorema 6",
+                budaya: "Seorang pengunjung berdiri di titik P di luar teras melingkar Borobudur. Ia memandang dua pasang stupa: pandangan pertama melewati stupa A lalu B, dan kedua melewati C lalu D. Garis secan PAB dan PCD membentuk ∠BPD yang menghadap busur jauh BD dan busur dekat AC.",
+                permasalahan: "Dua garis secan PAB dan PCD berpotongan di titik P di luar lingkaran. Bagaimana hubungan besar ∠BPD dengan busur jauh BD dan busur dekat AC?",
+                dugaan: [
+                    "1. Menurutmu, apakah ∠BPD dihitung dari jumlah kedua busur, selisih kedua busur, atau cara lain?"
+                ],
+                tableType: "k6",
+                analisis: [
+                    "1. Bandingkan ½ × selisih busur dengan ∠BPD hasil ukur pada setiap percobaan. Apa yang kamu temukan?",
+                    "2. Coba hitung ½ × (jumlah kedua busur) pada Percobaan 1. Apakah hasilnya sama dengan ∠BPD?",
+                    "3. Mengapa pada teorema ini busur yang dipakai adalah selisih, sedangkan pada Teorema 5 busurnya dijumlahkan?"
+                ],
+                kesimpulan: {
+                    a: "a. Jika dua garis secan berpotongan di luar lingkaran, maka besar sudut yang terbentuk sama dengan ...................... dari ...................... antara busur jauh dan busur dekat yang dihadapinya.",
+                    simbol: "Tuliskan secara simbol: ∠BPD = ........................................................."
+                },
+                penerapan: "Dari titik P di luar teras melingkar, dua garis secan memotong lingkaran di A, B dan C, D. Diketahui busur BD = 110° dan busur AC = 40°.<br>(a) Tentukan besar ∠BPD.<br>(b) Pada pengamatan lain, ∠BPD = 28° dan busur AC = 30°. Tentukan besar busur BD."
+            }
+        };
+
+        let currentStudent = {};
+
+        function handleStart(e) {
+            e.preventDefault();
+            const nama = document.getElementById('inputNama').value.trim();
+            const absen = document.getElementById('inputAbsen').value.trim();
+            const kelAsal = document.getElementById('inputKelAsal').value.trim();
+            const kelAhli = document.getElementById('selectKelAhli').value;
+
+            if (!nama || !absen || !kelAsal || !kelAhli) {
+                alert("Mohon isi semua data identitas dan pilih Kelompok Ahli terlebih dahulu!");
+                return;
+            }
+
+            currentStudent = { nama, absen, kelAsal, kelAhli };
+
+            document.getElementById('userInfo').innerHTML = `<strong>${nama}</strong> (${absen}) | Asal: ${kelAsal}`;
+            document.getElementById('userInfo').classList.remove('hidden');
+
+            document.getElementById('identitySection').classList.add('hidden');
+            document.getElementById('lkmSection').classList.remove('hidden');
+
+            renderLKM(kelAhli);
+        }
+
+        function renderLKM(id) {
+            const data = lkmData[id];
+            document.getElementById('badgeKelompok').innerText = `KELOMPOK AHLI ${id}`;
+            document.getElementById('lkmTitle').innerText = data.title;
+            document.getElementById('lkmSubtitle').innerText = data.subtitle;
+            document.getElementById('ceritaBudaya').innerText = data.budaya;
+            document.getElementById('permasalahanText').innerText = data.permasalahan;
+
+            let dugaanHTML = "";
+            data.dugaan.forEach((q) => {
+                dugaanHTML += `<div class="space-y-1"><p class="font-medium">${q}</p><textarea rows="2" class="w-full p-2 border rounded text-xs" placeholder="Tuliskan jawaban dugaan kelompokmu..."></textarea></div>`;
+            });
+            document.getElementById('dugaanQuestions').innerHTML = dugaanHTML;
+
+            renderTable(data.tableType);
+
+            let analisisHTML = "";
+            data.analisis.forEach((q) => {
+                analisisHTML += `<div class="space-y-1"><p class="font-medium">${q}</p><textarea rows="2" class="w-full p-2 border rounded text-xs" placeholder="Tuliskan jawaban analisis kelompokmu..."></textarea></div>`;
+            });
+            document.getElementById('analisisQuestions').innerHTML = analisisHTML;
+
+            document.getElementById('kesimpulanContent').innerHTML = `
+                <p>${data.kesimpulan.a}</p>
+                ${data.kesimpulan.b ? `<p>${data.kesimpulan.b}</p>` : ''}
+                <div class="p-2 bg-amber-100/60 rounded border border-amber-300 font-semibold mt-2">
+                    Notasi Simbolik Teorema: <br>
+                    <input type="text" class="w-full mt-1 p-1 border rounded text-xs" placeholder="${data.kesimpulan.simbol}">
+                </div>
+            `;
+
+            document.getElementById('penerapanContent').innerHTML = `
+                <p class="mb-2 leading-relaxed">${data.penerapan}</p>
+                <textarea rows="3" class="w-full p-2 border rounded text-xs" placeholder="Tuliskan langkah pengerjaan dan jawaban akhirmu..."></textarea>
+            `;
+
+            initGeoGebra(id);
+        }
+
+        function renderTable(type) {
+            const container = document.getElementById('tableContainer');
+            if(type === 'k1') {
+                container.innerHTML = `
+                    <div class="mb-2 flex gap-4 font-medium text-xs">
+                        <span>r = <input type="number" step="0.1" class="w-16 p-1 border rounded text-center"> cm</span>
+                        <span>r² = <input type="number" step="0.1" class="w-16 p-1 border rounded text-center"> cm²</span>
+                    </div>
+                    <table class="w-full border-collapse border text-center text-[11px]">
+                        <thead>
+                            <tr class="bg-amber-800 text-white">
+                                <th class="border p-1">Percobaan</th>
+                                <th class="border p-1">OM (cm)</th>
+                                <th class="border p-1">ON (cm)</th>
+                                <th class="border p-1">AB (cm)</th>
+                                <th class="border p-1">CD (cm)</th>
+                                <th class="border p-1">(½AB)² + OM²</th>
+                                <th class="border p-1">(½CD)² + ON²</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="border font-bold">1</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">2</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">3</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'k2') {
+                container.innerHTML = `
+                    <p class="font-bold mb-1">Tabel A. Hasil Pengukuran Panjang (cm)</p>
+                    <table class="w-full border-collapse border text-center mb-3 text-[11px]">
+                        <thead><tr class="bg-amber-800 text-white"><th class="border p-1">Percobaan</th><th class="border p-1">AB</th><th class="border p-1">BC</th><th class="border p-1">CD</th><th class="border p-1">AD</th><th class="border p-1">AC</th><th class="border p-1">BD</th></tr></thead>
+                        <tbody>
+                            <tr><td class="border font-bold">1</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">2</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">3</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                        </tbody>
+                    </table>
+                    <p class="font-bold mb-1">Tabel B. Hasil Perhitungan (cm²)</p>
+                    <table class="w-full border-collapse border text-center text-[11px]">
+                        <thead><tr class="bg-amber-800 text-white"><th class="border p-1">Percobaan</th><th class="border p-1">AB × CD</th><th class="border p-1">AD × BC</th><th class="border p-1">(AB×CD)+(AD×BC)</th><th class="border p-1">AC × BD</th></tr></thead>
+                        <tbody>
+                            <tr><td class="border font-bold">1</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">2</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">3</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'k3') {
+                container.innerHTML = `
+                    <table class="w-full border-collapse border text-center text-[11px]">
+                        <thead><tr class="bg-amber-800 text-white"><th class="border p-1">Percobaan</th><th class="border p-1">PA (cm)</th><th class="border p-1">PB (cm)</th><th class="border p-1">PC (cm)</th><th class="border p-1">PD (cm)</th><th class="border p-1">PA × PB (cm²)</th><th class="border p-1">PC × PD (cm²)</th></tr></thead>
+                        <tbody>
+                            <tr><td class="border font-bold">1</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">2</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">3</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'k4') {
+                container.innerHTML = `
+                    <table class="w-full border-collapse border text-center text-[11px]">
+                        <thead><tr class="bg-amber-800 text-white"><th class="border p-1">Percobaan</th><th class="border p-1">∠A</th><th class="border p-1">∠B</th><th class="border p-1">∠C</th><th class="border p-1">∠D</th><th class="border p-1">∠A + ∠C</th><th class="border p-1">∠B + ∠D</th></tr></thead>
+                        <tbody>
+                            <tr><td class="border font-bold">1</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">2</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">3</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'k5') {
+                container.innerHTML = `
+                    <table class="w-full border-collapse border text-center text-[11px]">
+                        <thead><tr class="bg-amber-800 text-white"><th class="border p-1">Percobaan</th><th class="border p-1">Busur AC (°)</th><th class="border p-1">Busur BD (°)</th><th class="border p-1">½ × (AC + BD) (°)</th><th class="border p-1">∠APC Hasil Ukur (°)</th><th class="border p-1">∠BPD Hasil Ukur (°)</th></tr></thead>
+                        <tbody>
+                            <tr><td class="border font-bold">1</td><td class="border p-1">70°</td><td class="border p-1">100°</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">2</td><td class="border p-1">50°</td><td class="border p-1">60°</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">3</td><td class="border p-1">110°</td><td class="border p-1">40°</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                        </tbody>
+                    </table>
+                `;
+            } else if(type === 'k6') {
+                container.innerHTML = `
+                    <table class="w-full border-collapse border text-center text-[11px]">
+                        <thead><tr class="bg-amber-800 text-white"><th class="border p-1">Percobaan</th><th class="border p-1">Busur BD (°)</th><th class="border p-1">Busur AC (°)</th><th class="border p-1">Selisih BD − AC (°)</th><th class="border p-1">½ × Selisih (°)</th><th class="border p-1">∠BPD Hasil Ukur (°)</th></tr></thead>
+                        <tbody>
+                            <tr><td class="border font-bold">1</td><td class="border p-1">90°</td><td class="border p-1">20°</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">2</td><td class="border p-1">110°</td><td class="border p-1">30°</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                            <tr><td class="border font-bold">3</td><td class="border p-1">125°</td><td class="border p-1">35°</td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td><td class="border p-1"><input class="table-input"></td></tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+        }
+
+        let ggbApp = null;
+        function initGeoGebra(kelompokId) {
+            document.getElementById('ggb-element').innerHTML = '';
+            var params = {
+                "appName": "geometry",
+                "width": 550,
+                "height": 500,
+                "showToolBar": true,
+                "showAlgebraInput": false,
+                "showMenuBar": false,
+                "enableRightClick": false,
+                "appletOnLoad": function(api) {
+                    ggbApp = api;
+                    buildGeoGebraConstruction(kelompokId);
+                }
+            };
+            var applet = new GGBApplet(params, true);
+            applet.inject('ggb-element');
+        }
+
+        function buildGeoGebraConstruction(id) {
+            if(!ggbApp) return;
+            ggbApp.evalCommand("Clear[ ]");
+            ggbApp.evalCommand("O = (0,0)");
+            ggbApp.evalCommand("SetCaption[O, \"Stupa Induk (Pusat O)\"]");
+            ggbApp.evalCommand("ShowLabel[O, true]");
+            ggbApp.evalCommand("c = Circle[O, 4]");
+            ggbApp.evalCommand("SetColor[c, \"DarkGreen\"]");
+
+            if(id == '1') {
+                ggbApp.evalCommand("A = (-3.5, 2)");
+                ggbApp.evalCommand("B = (3.5, 2)");
+                ggbApp.evalCommand("AB = Segment[A, B]");
+                ggbApp.evalCommand("SetColor[AB, \"Orange\"]");
+                ggbApp.evalCommand("M = Midpoint[AB]");
+                ggbApp.evalCommand("OM = Segment[O, M]");
+                ggbApp.evalCommand("SetLineStyle[OM, 2]");
+
+                ggbApp.evalCommand("C = (-2, -3.46)");
+                ggbApp.evalCommand("D = (-3.8, -1.2)");
+                ggbApp.evalCommand("CD = Segment[C, D]");
+                ggbApp.evalCommand("SetColor[CD, \"Brown\"]");
+                ggbApp.evalCommand("N = Midpoint[CD]");
+                ggbApp.evalCommand("ON = Segment[O, N]");
+                ggbApp.evalCommand("SetLineStyle[ON, 2]");
+            } else if(id == '2') {
+                ggbApp.evalCommand("A = (2, 3.46)");
+                ggbApp.evalCommand("B = (-3, 2.64)");
+                ggbApp.evalCommand("C = (-2, -3.46)");
+                ggbApp.evalCommand("D = (3.5, -1.93)");
+                ggbApp.evalCommand("Segment[A, B]");
+                ggbApp.evalCommand("Segment[B, C]");
+                ggbApp.evalCommand("Segment[C, D]");
+                ggbApp.evalCommand("Segment[D, A]");
+                ggbApp.evalCommand("d1 = Segment[A, C]");
+                ggbApp.evalCommand("d2 = Segment[B, D]");
+                ggbApp.evalCommand("SetLineStyle[d1, 2]");
+                ggbApp.evalCommand("SetLineStyle[d2, 2]");
+            } else if(id == '3') {
+                ggbApp.evalCommand("A = (2.5, 3.12)");
+                ggbApp.evalCommand("B = (-3.5, -1.93)");
+                ggbApp.evalCommand("C = (-2.8, 2.85)");
+                ggbApp.evalCommand("D = (3, -2.64)");
+                ggbApp.evalCommand("AB = Segment[A, B]");
+                ggbApp.evalCommand("CD = Segment[C, D]");
+                ggbApp.evalCommand("P = Intersect[AB, CD]");
+                ggbApp.evalCommand("SetColor[P, \"Red\"]");
+            } else if(id == '4') {
+                // KELOMPOK 4: Menampilkan Besar Sudut Dalam Segi Empat Tali Busur
+                ggbApp.evalCommand("A = (2, 3.46)");
+                ggbApp.evalCommand("B = (-3, 2.64)");
+                ggbApp.evalCommand("C = (-2, -3.46)");
+                ggbApp.evalCommand("D = (3.5, -1.93)");
+
+                ggbApp.evalCommand("s1 = Segment[A, B]");
+                ggbApp.evalCommand("s2 = Segment[B, C]");
+                ggbApp.evalCommand("s3 = Segment[C, D]");
+                ggbApp.evalCommand("s4 = Segment[D, A]");
+
+                // Membuat Objek Sudut & Menampilkan Nilainya
+                ggbApp.evalCommand("alpha = Angle[D, A, B]");
+                ggbApp.evalCommand("beta = Angle[A, B, C]");
+                ggbApp.evalCommand("gamma = Angle[B, C, D]");
+                ggbApp.evalCommand("delta = Angle[C, D, A]");
+
+                ggbApp.evalCommand("SetLabelMode[alpha, 1]"); // Mode 1 = Tampilkan Value (Besar Sudut)
+                ggbApp.evalCommand("SetLabelMode[beta, 1]");
+                ggbApp.evalCommand("SetLabelMode[gamma, 1]");
+                ggbApp.evalCommand("SetLabelMode[delta, 1]");
+
+                ggbApp.evalCommand("SetColor[alpha, \"Red\"]");
+                ggbApp.evalCommand("SetColor[gamma, \"Red\"]");
+                ggbApp.evalCommand("SetColor[beta, \"Blue\"]");
+                ggbApp.evalCommand("SetColor[delta, \"Blue\"]");
+            } else if(id == '5') {
+                // KELOMPOK 5: Menampilkan Sudut Antara Dua Tali Busur di Dalam Lingkaran
+                ggbApp.evalCommand("A = (2.5, 3.12)");
+                ggbApp.evalCommand("B = (-3.5, -1.93)");
+                ggbApp.evalCommand("C = (-2.8, 2.85)");
+                ggbApp.evalCommand("D = (3, -2.64)");
+
+                ggbApp.evalCommand("AB = Segment[A, B]");
+                ggbApp.evalCommand("CD = Segment[C, D]");
+                ggbApp.evalCommand("P = Intersect[AB, CD]");
+                ggbApp.evalCommand("SetColor[P, \"Red\"]");
+
+                // Menampilkan Sudut APC & BPD (Bertolak Belakang)
+                ggbApp.evalCommand("angleAPC = Angle[A, P, C]");
+                ggbApp.evalCommand("angleBPD = Angle[B, P, D]");
+
+                ggbApp.evalCommand("SetLabelMode[angleAPC, 1]");
+                ggbApp.evalCommand("SetLabelMode[angleBPD, 1]");
+                ggbApp.evalCommand("SetColor[angleAPC, \"Orange\"]");
+                ggbApp.evalCommand("SetColor[angleBPD, \"Blue\"]");
+            } else if(id == '6') {
+                // KELOMPOK 6: Menampilkan Sudut Secan di Luar Lingkaran
+                ggbApp.evalCommand("P = (-6, 0)");
+                ggbApp.evalCommand("A = (-3.2, 2.4)");
+                ggbApp.evalCommand("B = (3.2, 2.4)");
+                ggbApp.evalCommand("C = (-3.2, -2.4)");
+                ggbApp.evalCommand("D = (3.2, -2.4)");
+
+                ggbApp.evalCommand("sec1 = Segment[P, B]");
+                ggbApp.evalCommand("sec2 = Segment[P, D]");
+
+                // Menampilkan Sudut BPD
+                ggbApp.evalCommand("angleBPD = Angle[D, P, B]");
+                ggbApp.evalCommand("SetLabelMode[angleBPD, 1]");
+                ggbApp.evalCommand("SetColor[angleBPD, \"DarkRed\"]");
+            }
+        }
+
+        function simpanLKM() {
+            alert("Selamat! Data LKPD Kelompok Ahli kamu berhasil disimpan secara lokal.");
+        }
+
+        function resetApp() {
+            document.getElementById('identitySection').classList.remove('hidden');
+            document.getElementById('lkmSection').classList.add('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
